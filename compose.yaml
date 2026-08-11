@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: pippal
+      POSTGRES_PASSWORD: pippal
+      POSTGRES_DB: pippal_light_crm_development
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pippal -d pippal_light_crm_development"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    volumes:
+      - postgres18_data:/var/lib/postgresql
+
+volumes:
+  postgres18_data:

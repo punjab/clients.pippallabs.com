@@ -1,0 +1,33 @@
+<% content_for :title, "#{@lead.contact.name || 'Lead'} · Pippal CRM" %>
+<%= link_to "← Back to leads", leads_path, class: "text-xs font-bold text-slate-400 hover:text-slate-900" %>
+<div class="mt-4 flex flex-wrap items-start justify-between gap-4"><div><div class="flex items-center gap-3"><h1 class="text-3xl font-extrabold tracking-tight"><%= @lead.contact.name.presence || "Unnamed contact" %></h1><%= status_badge(@lead.status) %></div><p class="mt-2 text-sm text-slate-500"><%= @lead.lead_type.humanize %> · received <%= l(@lead.occurred_at, format: :long) %></p></div><div class="text-right"><p class="eyebrow">Estimated value</p><p class="mt-1 text-2xl font-extrabold"><%= money(@lead.estimated_value) %></p></div></div>
+
+<div class="mt-6 grid gap-5 xl:grid-cols-[1fr_360px]">
+  <div class="space-y-5">
+    <section class="panel p-6"><p class="eyebrow">The request</p><p class="mt-4 whitespace-pre-wrap text-base leading-7 text-slate-700"><%= @lead.message.presence || "No message was included with this lead." %></p><div class="mt-6 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-3"><div><p class="eyebrow">Email</p><p class="mt-1 text-sm font-semibold"><%= @lead.contact.email || "—" %></p></div><div><p class="eyebrow">Phone</p><p class="mt-1 text-sm font-semibold"><%= @lead.contact.phone || "—" %></p></div><div><p class="eyebrow">Source</p><p class="mt-1 text-sm font-semibold"><%= @lead.source.humanize %></p></div></div></section>
+
+    <section class="panel p-6"><p class="eyebrow">Add context</p><%= form_with url: note_lead_path(@lead), class: "mt-3 flex gap-3" do |form| %><%= form.text_area :note, rows: 2, required: true, placeholder: "Record a call, decision, or next step…", class: "field !mt-0 resize-none" %><%= form.submit "Add note", class: "button-primary self-end" %><% end %></section>
+
+    <section class="panel overflow-hidden"><div class="border-b border-slate-100 px-6 py-4"><p class="eyebrow">Audit trail</p><h2 class="mt-1 text-lg font-bold">History</h2></div><div class="divide-y divide-slate-100">
+      <% @history.each do |entry| %><div class="flex gap-4 px-6 py-4"><span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-300 ring-4 ring-amber-50"></span><div class="min-w-0"><p class="text-sm font-semibold"><% if entry.change_type == "note_added" %><%= entry.note %><% elsif entry.change_type == "status_changed" || entry.change_type == "reopened" %><%= entry.from_status&.humanize || "Created" %> → <%= entry.to_status.humanize %><% else %><%= entry.change_type.humanize %><% end %></p><p class="mt-1 text-xs text-slate-400"><%= entry.actor&.name || "System" %> · <%= l(entry.occurred_at, format: :short) %></p></div></div><% end %>
+      <% if @history.empty? %><p class="px-6 py-8 text-sm text-slate-400">No changes have been recorded yet.</p><% end %>
+    </div></section>
+  </div>
+
+  <aside class="panel h-fit p-5 xl:sticky xl:top-6"><p class="eyebrow">Work the lead</p>
+    <% if @lead.terminal? %><div class="mt-4 rounded-xl bg-slate-50 p-4"><p class="text-sm font-bold">This lead is closed.</p><p class="mt-1 text-xs leading-5 text-slate-400">Reopen it before changing workflow fields.</p><%= button_to "Reopen as New", reopen_lead_path(@lead), class: "button-secondary mt-3 w-full" %></div><% else %>
+      <%= form_with model: @lead, class: "mt-4 space-y-4" do |form| %>
+        <label class="block"><span class="text-xs font-bold text-slate-500">Next status</span><%= form.select :status, [[@lead.status.humanize, @lead.status]] + next_status_options(@lead), {}, class: "field" %></label>
+        <label class="block"><span class="text-xs font-bold text-slate-500">Owner</span><%= form.select :owner_id, @members.map { |membership| [membership.user.name, membership.user_id] }, { include_blank: "Unassigned" }, class: "field" %></label>
+        <label class="block"><span class="text-xs font-bold text-slate-500">Location</span><%= form.select :location_id, @locations.map { |location| [location.name, location.id] }, { include_blank: "Unknown" }, class: "field" %></label>
+        <label class="block"><span class="text-xs font-bold text-slate-500">Follow-up</span><%= form.datetime_local_field :follow_up_at, class: "field" %></label>
+        <label class="block"><span class="text-xs font-bold text-slate-500">Estimated value</span><%= form.number_field :estimated_value, min: 0, step: 0.01, class: "field" %></label>
+        <label class="block"><span class="text-xs font-bold text-slate-500">Actual value <span class="font-normal text-slate-400">(Won only)</span></span><%= form.number_field :actual_value, min: 0, step: 0.01, class: "field" %></label>
+        <label class="block"><span class="text-xs font-bold text-slate-500">Lost reason <span class="font-normal text-slate-400">(required for Lost)</span></span><%= form.text_field :lost_reason, class: "field" %></label>
+        <%= form.submit "Save changes", class: "button-primary w-full" %>
+      <% end %>
+    <% end %>
+    <div class="mt-5 border-t border-slate-100 pt-5"><div class="flex justify-between text-xs"><span class="text-slate-400">Location</span><span class="font-bold"><%= @lead.location&.name || "Unknown" %></span></div><div class="mt-3 flex justify-between text-xs"><span class="text-slate-400">Landing page</span><span class="max-w-44 truncate font-bold"><%= @lead.page_url %></span></div></div>
+  </aside>
+</div>
+

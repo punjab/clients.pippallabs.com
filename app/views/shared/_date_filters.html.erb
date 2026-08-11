@@ -1,0 +1,7 @@
+<%= form_with url: path, method: :get, class: "flex flex-wrap items-end gap-2" do |form| %>
+  <label class="block"><span class="sr-only">From</span><%= form.date_field :from, value: range.begin, class: "rounded-xl px-3 py-2 text-xs font-semibold" %></label>
+  <span class="pb-2 text-xs text-slate-400">to</span>
+  <label class="block"><span class="sr-only">To</span><%= form.date_field :to, value: range.end, class: "rounded-xl px-3 py-2 text-xs font-semibold" %></label>
+  <%= form.submit "Apply", class: "button-secondary !py-2 !text-xs" %>
+<% end %>
+

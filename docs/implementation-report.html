@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pippal Labs Light CRM — Implementation Report</title>
+  <style>
+    :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --paper:#f6f6f1; --card:#fff; --accent:#fcd34d; --green:#047857; --green-bg:#ecfdf5; --amber:#92400e; --amber-bg:#fffbeb; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); background:var(--paper); font:15px/1.65 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    a { color:inherit; }
+    .shell { display:grid; grid-template-columns:230px minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; padding:30px 22px; background:#fff; border-right:1px solid var(--line); }
+    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .mark { display:grid; place-items:center; width:40px; height:40px; border-radius:13px; background:var(--accent); font-size:20px; font-weight:900; }
+    .brand strong,.brand small { display:block; line-height:1.25; }.brand small { margin-top:3px; color:#94a3b8; font-size:9px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; }
+    nav { margin-top:42px; }
+    nav a { display:block; margin:4px 0; padding:9px 12px; border-radius:10px; color:var(--muted); font-size:13px; font-weight:700; text-decoration:none; }
+    nav a:hover { color:#fff; background:var(--ink); }
+    .meta { position:absolute; right:22px; bottom:28px; left:22px; padding-top:20px; border-top:1px solid var(--line); color:#94a3b8; font-size:11px; }
+    main { min-width:0; }
+    .hero { padding:72px clamp(28px,6vw,90px) 64px; color:#fff; background:var(--ink); }
+    .eyebrow { margin:0 0 13px; color:#94a3b8; font-size:10px; font-weight:900; letter-spacing:.19em; text-transform:uppercase; }
+    h1 { max-width:850px; margin:0; font-size:clamp(40px,6vw,76px); line-height:.98; letter-spacing:-.055em; }
+    .hero-copy { max-width:690px; margin:26px 0 0; color:#cbd5e1; font-size:18px; }
+    .status { display:inline-flex; align-items:center; gap:8px; margin-top:32px; padding:8px 12px; border:1px solid rgba(255,255,255,.14); border-radius:999px; color:#d1fae5; background:rgba(16,185,129,.1); font-size:12px; font-weight:800; }
+    .status::before { content:""; width:8px; height:8px; border-radius:50%; background:#34d399; box-shadow:0 0 0 4px rgba(52,211,153,.12); }
+    .content { max-width:1260px; margin:auto; padding:56px clamp(28px,5vw,70px) 100px; }
+    section { scroll-margin-top:28px; margin-bottom:68px; }
+    h2 { margin:0; font-size:30px; letter-spacing:-.035em; }
+    h3 { margin:0; font-size:17px; letter-spacing:-.015em; }
+    .lead { max-width:760px; margin:10px 0 0; color:var(--muted); }
+    .grid { display:grid; gap:16px; }.grid.four { grid-template-columns:repeat(4,1fr); }.grid.two { grid-template-columns:repeat(2,1fr); }
+    .card { padding:22px; border:1px solid var(--line); border-radius:17px; background:var(--card); box-shadow:0 1px 2px rgba(15,23,42,.025); }
+    .metric-grid { margin-top:28px; }.metric strong { display:block; margin-top:8px; font-size:28px; letter-spacing:-.04em; }.metric span { color:var(--muted); font-size:12px; }
+    .architecture { display:grid; grid-template-columns:1fr 32px 1.2fr 32px 1fr; align-items:stretch; gap:10px; margin-top:26px; }
+    .architecture .node { display:flex; min-height:140px; flex-direction:column; justify-content:center; padding:24px; border:1px solid var(--line); border-radius:17px; background:#fff; }
+    .architecture .node.core { color:#fff; background:var(--ink); border-color:var(--ink); }.architecture .node.core p { color:#94a3b8; }
+    .architecture .arrow { display:grid; place-items:center; color:#94a3b8; font-size:25px; }.architecture p { margin:8px 0 0; color:var(--muted); font-size:12px; }
+    table { width:100%; margin-top:25px; border-collapse:separate; border-spacing:0; overflow:hidden; border:1px solid var(--line); border-radius:16px; background:#fff; }
+    th,td { padding:14px 16px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; } th { color:#94a3b8; background:#f8fafc; font-size:10px; letter-spacing:.14em; text-transform:uppercase; } td { font-size:13px; } tr:last-child td { border-bottom:0; }
+    .pill { display:inline-flex; padding:3px 8px; border-radius:999px; color:var(--green); background:var(--green-bg); font-size:10px; font-weight:900; text-transform:uppercase; }.pill.pending { color:var(--amber); background:var(--amber-bg); }
+    .checklist { display:grid; gap:10px; margin:24px 0 0; padding:0; list-style:none; }.checklist li { position:relative; padding:14px 16px 14px 44px; border:1px solid var(--line); border-radius:13px; background:#fff; }.checklist li::before { content:"✓"; position:absolute; left:16px; top:14px; color:var(--green); font-weight:900; }
+    .decision { display:grid; grid-template-columns:54px 1fr; gap:16px; align-items:start; }.number { display:grid; place-items:center; width:42px; height:42px; border-radius:12px; color:var(--ink); background:var(--accent); font-weight:900; }.decision p { margin:5px 0 0; color:var(--muted); font-size:13px; }
+    pre { overflow:auto; margin:22px 0 0; padding:22px; border-radius:16px; color:#dbeafe; background:#020617; font:13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .callout { margin-top:24px; padding:20px 22px; border-left:4px solid var(--accent); border-radius:4px 14px 14px 4px; background:#fff; }.callout strong { display:block; }.callout p { margin:5px 0 0; color:var(--muted); }
+    .footer { padding-top:28px; border-top:1px solid var(--line); color:#94a3b8; font-size:12px; }
+    @media (max-width:980px) { .shell { display:block; } aside { position:static; width:auto; height:auto; padding:18px 22px; border-right:0; border-bottom:1px solid var(--line); } nav { display:none; }.meta { display:none; }.grid.four { grid-template-columns:repeat(2,1fr); }.architecture { grid-template-columns:1fr; }.architecture .arrow { transform:rotate(90deg); } }
+    @media (max-width:620px) { .hero { padding:52px 22px; }.content { padding:40px 18px 70px; }.grid.four,.grid.two { grid-template-columns:1fr; } h1 { font-size:46px; } table { display:block; overflow-x:auto; }.metric-grid { grid-template-columns:repeat(2,1fr)!important; } }
+    @media print { aside { display:none; }.shell { display:block; }.hero { padding:36px; }.content { max-width:none; padding:36px; } section { break-inside:avoid; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <a class="brand" href="#top"><span class="mark">P</span><span><strong>Pippal Labs</strong><small>Delivery report</small></span></a>
+      <nav>
+        <a href="#outcome">Outcome</a><a href="#architecture">Architecture</a><a href="#scope">P0 coverage</a><a href="#quality">Quality</a><a href="#decisions">Decisions</a><a href="#run">Run locally</a><a href="#deploy">Deployment</a><a href="#gates">Pilot gates</a>
+      </nav>
+      <div class="meta">Prepared 10 August 2026<br>Implementation state: local</div>
+    </aside>
+
+    <main id="top">
+      <header class="hero">
+        <p class="eyebrow">Pippal Labs Light CRM · MVP implementation</p>
+        <h1>Demand signals are now actionable.</h1>
+        <p class="hero-copy">A working multi-tenant CRM now connects client-site activity and form leads to assignment, follow-up, outcomes, and a reconciled monthly account story.</p>
+        <span class="status">Built, seeded, and verified locally</span>
+      </header>
+
+      <div class="content">
+        <section id="outcome">
+          <p class="eyebrow">01 · Outcome</p><h2>What was delivered</h2>
+          <p class="lead">The definition pack has become a responsive Rails application, public ingestion API, browser tracker, background-job runtime, admin setup surface, repeatable demo environment, and deployment blueprint.</p>
+          <div class="grid four metric-grid">
+            <div class="card metric"><span>HTTP integration tests</span><strong>9</strong><span>77 assertions</span></div>
+            <div class="card metric"><span>Security scan</span><strong>0</strong><span>Brakeman warnings</span></div>
+            <div class="card metric"><span>Private roles</span><strong>4</strong><span>Tenant + location scope</span></div>
+            <div class="card metric"><span>Stateful services</span><strong>1</strong><span>PostgreSQL only</span></div>
+          </div>
+          <ul class="checklist">
+            <li>Agency operators can create workspaces and configure locations, websites, revocable keys, users, and roles without database access.</li>
+            <li>Managers can filter, assign, follow up, value, note, close, and explicitly reopen leads while every change remains attributable.</li>
+            <li>Overview, locations, acquisition insights, and monthly reports reconcile to the same accepted event and lead records.</li>
+            <li>The demo works on desktop and mobile and includes realistic thirty-day data for three locations.</li>
+          </ul>
+        </section>
+
+        <section id="architecture">
+          <p class="eyebrow">02 · Architecture</p><h2>A deliberately boring modular monolith</h2>
+          <p class="lead">Rails owns transactions and presentation; explicit ingestion, workflow, and reporting modules preserve seams for later extraction. PostgreSQL owns durable state, jobs, cache, raw events, and audit records.</p>
+          <div class="architecture">
+            <div class="node"><h3>Client websites</h3><p>Cookie-free tracker plus server-side form integration. Public tracking keys map to one active website.</p></div><div class="arrow">→</div>
+            <div class="node core"><h3>Rails 8.1 application</h3><p>Public APIs · sessions and policy scope · lead workflow · metric queries · Hotwire UI · Active Job</p></div><div class="arrow">→</div>
+            <div class="node"><h3>PostgreSQL 18</h3><p>Tenant records · immutable events · append-only history · notifications · reports · Solid Queue/cache</p></div>
+          </div>
+          <div class="grid two" style="margin-top:16px">
+            <div class="card"><h3>Public boundary</h3><p>64 KB limits, IP rate limits, key digest lookup, field allowlists, plausible timestamps, configured-domain checks, URL validation, tenant-scoped idempotency, and no arbitrary event PII.</p></div>
+            <div class="card"><h3>Private boundary</h3><p>Signed HTTP-only sessions derive the current membership. Queries begin from that tenant and add the assigned-location constraint for location managers.</p></div>
+          </div>
+        </section>
+
+        <section id="scope">
+          <p class="eyebrow">03 · P0 coverage</p><h2>Definition-pack traceability</h2>
+          <table>
+            <thead><tr><th>ID</th><th>Capability</th><th>Implementation</th><th>State</th></tr></thead>
+            <tbody>
+              <tr><td>F1</td><td>Tenant foundation</td><td>Agency portfolio, workspace switcher, locations, domains, keys, members, and roles.</td><td><span class="pill">Built</span></td></tr>
+              <tr><td>F2</td><td>Access control</td><td>Signed sessions; agency, owner, manager, viewer roles; tenant and location request tests.</td><td><span class="pill">Built</span></td></tr>
+              <tr><td>F3–F4</td><td>Tracking + attribution</td><td>Retrying tracker, six event types, raw supported attribution, unknown defaults, immutable events.</td><td><span class="pill">Built</span></td></tr>
+              <tr><td>F5–F6</td><td>Lead capture + contacts</td><td>Transactional idempotency, normalized identity resolution, separate opportunities, one alert intent.</td><td><span class="pill">Built</span></td></tr>
+              <tr><td>F7</td><td>Lead workflow</td><td>Canonical state machine, ownership, location, follow-up, values, notes, lost reason, reopen, audit history.</td><td><span class="pill">Built</span></td></tr>
+              <tr><td>F8</td><td>Notifications</td><td>Durable delivery record, asynchronous SMTP, retryable attempts, provider result/error visibility.</td><td><span class="pill pending">Needs SMTP</span></td></tr>
+              <tr><td>F9–F10</td><td>Overview + inbox</td><td>Date/location metrics, trends, sources, pages, locations, operational filters, responsive detail workflow.</td><td><span class="pill">Built</span></td></tr>
+              <tr><td>F11</td><td>Monthly summary</td><td>Versioned in-app reports, on-demand regeneration, scheduled account and location generation.</td><td><span class="pill">Built</span></td></tr>
+              <tr><td>F12</td><td>Auditability</td><td>Raw events, source fields, request IDs, append-only history, notification attempts, report snapshots.</td><td><span class="pill">Built</span></td></tr>
+            </tbody>
+          </table>
+          <div class="callout"><strong>Implementation is not the pilot SLA.</strong><p>The software paths exist and reconcile in controlled tests. The 95%/99% reliability and response-time targets still require real pilot telemetry over the stated review windows.</p></div>
+        </section>
+
+        <section id="quality">
+          <p class="eyebrow">04 · Verification</p><h2>Evidence collected before handoff</h2>
+          <div class="grid two" style="margin-top:25px">
+            <div class="card"><h3>Behavioral tests</h3><p>Tenant isolation, event retries, lead/contact/alert deduplication, audited workflow, lost/reopen rules, report reconciliation, scheduled reports, public validation, and full HTML page rendering.</p></div>
+            <div class="card"><h3>Static and security checks</h3><p>78 Ruby files with zero RuboCop offenses; Zeitwerk eager-load clean; Brakeman zero warnings; Ruby advisory DB and importmap audits report no vulnerable packages.</p></div>
+            <div class="card"><h3>Live browser QA</h3><p>Authenticated seeded dashboard rendered at 1440×1050 and 390×844. Navigation, charts, metric cards, location summary, and lead list remained usable at both sizes.</p></div>
+            <div class="card"><h3>Data contracts</h3><p>Database foreign keys, tenant-leading indexes, partial identity uniqueness, idempotency constraints, immutable event policy, and report version uniqueness enforce key invariants below controllers.</p></div>
+          </div>
+        </section>
+
+        <section id="decisions">
+          <p class="eyebrow">05 · Decisions</p><h2>Why this stack and shape</h2>
+          <div class="grid two" style="margin-top:25px">
+            <div class="card decision"><span class="number">01</span><div><h3>Rails + Hotwire</h3><p>One security and transaction boundary, minimal client state, accessible server HTML, and fast pilot iteration without a separate API/SPA release train.</p></div></div>
+            <div class="card decision"><span class="number">02</span><div><h3>PostgreSQL everywhere</h3><p>Application state, source events, audit, queue, and cache use one operational datastore until measured scale justifies extraction.</p></div></div>
+            <div class="card decision"><span class="number">03</span><div><h3>Application-scoped tenancy</h3><p>Membership-derived queries plus constraints and request tests are explicit today; row-level security remains a documented later hardening option.</p></div></div>
+            <div class="card decision"><span class="number">04</span><div><h3>Raw facts, derived proof</h3><p>Reports snapshot the same metric engine as the dashboard. Clicks remain intent; only won actual values count as attributed revenue.</p></div></div>
+          </div>
+          <p class="lead" style="margin-top:20px">Durable records: <a href="adr/0001-modular-rails-monolith.md">ADR-0001</a> through <a href="adr/0005-runtime-and-deployment.md">ADR-0005</a>. Chronology: <a href="decision-log.md">decision log</a>.</p>
+        </section>
+
+        <section id="run">
+          <p class="eyebrow">06 · Local use</p><h2>From clone to dashboard</h2>
+          <pre><code>bin/setup --skip-server
+bin/dev
+
+# open http://localhost:3000
+# agency@pippallabs.test / pippal-demo-2026</code></pre>
+          <p class="lead">Docker Compose starts PostgreSQL on port 5433. Setup migrates and idempotently seeds the Northstar Pizza demo. Development emails are written to <code>tmp/mails</code>.</p>
+          <p class="lead">Client integration examples are in <a href="integration-guide.md">the integration guide</a>; runnable commands and all demo roles are in <a href="../README.md">README.md</a>.</p>
+        </section>
+
+        <section id="deploy">
+          <p class="eyebrow">07 · Recommended deployment</p><h2>Managed pilot first; portable container always</h2>
+          <p class="lead">The initial recommendation is Render: one Docker web service, one worker, and one managed PostgreSQL database in the same region. This minimizes pilot operations while retaining a normal Docker image that can later move to Kamal or another provider.</p>
+          <div class="architecture" style="grid-template-columns:1fr 32px 1fr 32px 1fr">
+            <div class="node"><h3>Render web</h3><p>TLS proxy, health check at /up, zero-downtime deploys, Rails/Puma/Thruster container.</p></div><div class="arrow">+</div>
+            <div class="node"><h3>Render worker</h3><p>Solid Queue supervisor, lead alerts, scheduled monthly summaries, visible failed jobs.</p></div><div class="arrow">+</div>
+            <div class="node"><h3>Managed Postgres</h3><p>Backups, one connection URL, source records, app data, queue, and cache tables.</p></div>
+          </div>
+          <p class="lead"><code>render.yaml</code> expresses this topology but nothing has been deployed. See the <a href="https://render.com/docs/deploy-rails-8">official Rails 8 deployment guide</a> and <a href="https://render.com/docs/postgresql">managed PostgreSQL documentation</a>.</p>
+        </section>
+
+        <section id="gates">
+          <p class="eyebrow">08 · Before pilot</p><h2>Decisions software should not invent</h2>
+          <table>
+            <thead><tr><th>Gate</th><th>Needed from</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td>Privacy jurisdiction and retention/deletion period</td><td>Legal + product</td><td>Controls notices, consent behavior, deletion ownership, and cache/source-record lifetime.</td></tr>
+              <tr><td>Pilot domains, locations, recipients, and CTA selectors</td><td>Product + client</td><td>Turns the generic validated contracts into one truthful client configuration.</td></tr>
+              <tr><td>SMTP provider and sender authentication</td><td>Engineering</td><td>Required to prove delivery latency and provider-outage behavior outside local file delivery.</td></tr>
+              <tr><td>Backups, alerting, and support ownership</td><td>Engineering + operations</td><td>Required for the two-week hardening gate and incident recovery.</td></tr>
+              <tr><td>Pilot targets and outcome window approval</td><td>Product + client</td><td>Converts proposed targets into go/no-go measurements and prevents premature revenue claims.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <footer class="footer">Pippal Labs Light CRM · Local implementation completed 10 August 2026 · Generated as a standalone HTML handoff artifact.</footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

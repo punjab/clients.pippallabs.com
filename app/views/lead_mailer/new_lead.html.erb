@@ -1,0 +1,6 @@
+<h1>New <%= @lead.lead_type.humanize.downcase %> lead</h1>
+<p><strong><%= @contact.name.presence || "Website visitor" %></strong> submitted a new request.</p>
+<p><%= @lead.message %></p>
+<p>Location: <%= @lead.location&.name || "Unknown" %></p>
+<p>Open Pippal CRM to assign and follow up with this lead.</p>
+
