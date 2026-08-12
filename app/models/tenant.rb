@@ -8,6 +8,15 @@ class Tenant < ApplicationRecord
   has_many :leads, dependent: :destroy
   has_many :notifications, dependent: :destroy
   has_many :reports, dependent: :destroy
+  has_many :workspace_features, dependent: :destroy
+  has_many :job_postings, dependent: :destroy
+  has_many :job_applicants, dependent: :destroy
+  has_many :job_applications, dependent: :destroy
+  has_many :job_application_histories, dependent: :destroy
+
+  def feature_enabled?(key)
+    workspace_features.where(key:, enabled: true).exists?
+  end
 
   validate :notification_email_is_valid
 

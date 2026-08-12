@@ -17,3 +17,12 @@ This chronological log complements the durable decisions in `docs/adr/`.
 - Added a checked-in Render Blueprint using separate web and job processes, a migration pre-deploy step, health checks, deploy-after-checks, and the smallest paid managed PostgreSQL tier suitable for a persistent pilot.
 - Completed responsive browser QA at desktop and mobile widths, then optimized dashboard location aggregation after observing its live query profile.
 - Required production SMTP, an explicit application host, and the Rails master key at runtime; build-time placeholders are intentionally non-secret and exist only so assets can compile in the container image.
+
+## 2026-08-11
+
+- Corrected the seeded pilot client name to Curry Pizza Company and migrated the existing local demo workspace rather than creating a duplicate tenant.
+- Made recruiting a reusable workspace feature that is available to all clients and activated independently by an agency administrator.
+- Kept applicants, applications, positions, and application histories separate from customer contacts and sales leads because their purpose, access, retention, and workflow differ.
+- Chose structured application intake without résumé uploads for the first release; private file storage, scanning, signed access, and retention automation must precede attachments.
+- Allowed agency administrators and client owners to manage tenant-wide recruiting, limited location managers to their assigned location, and denied applicant access to viewers.
+- Replaced effectively permanent authentication cookies with HTTP-only, same-site, production-secure cookies that expire after 14 days.

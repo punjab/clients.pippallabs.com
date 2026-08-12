@@ -30,6 +30,9 @@
             <%= nav_link "Locations", locations_path, :locations %>
             <%= nav_link "Pages & sources", insights_path, :insights %>
             <%= nav_link "Reports", reports_path, :reports %>
+            <% if current_tenant.feature_enabled?(:recruiting) && current_membership.can_access_recruiting? %>
+              <%= nav_link "Recruiting", recruiting_path, :recruiting %>
+            <% end %>
             <% if current_membership.agency_admin? %>
               <%= nav_link "Workspace", workspace_path, :settings %>
             <% end %>
@@ -75,4 +78,3 @@
     <% end %>
   </body>
 </html>
-

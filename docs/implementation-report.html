@@ -58,14 +58,14 @@
       <nav>
         <a href="#outcome">Outcome</a><a href="#architecture">Architecture</a><a href="#scope">P0 coverage</a><a href="#quality">Quality</a><a href="#decisions">Decisions</a><a href="#run">Run locally</a><a href="#deploy">Deployment</a><a href="#gates">Pilot gates</a>
       </nav>
-      <div class="meta">Prepared 10 August 2026<br>Implementation state: local</div>
+      <div class="meta">Updated 11 August 2026<br>Implementation state: local</div>
     </aside>
 
     <main id="top">
       <header class="hero">
         <p class="eyebrow">Pippal Labs Light CRM · MVP implementation</p>
         <h1>Demand signals are now actionable.</h1>
-        <p class="hero-copy">A working multi-tenant CRM now connects client-site activity and form leads to assignment, follow-up, outcomes, and a reconciled monthly account story.</p>
+        <p class="hero-copy">A working multi-tenant CRM connects client-site activity and form leads to sales outcomes, while an optional privacy-separated recruiting module handles job applications.</p>
         <span class="status">Built, seeded, and verified locally</span>
       </header>
 
@@ -74,7 +74,7 @@
           <p class="eyebrow">01 · Outcome</p><h2>What was delivered</h2>
           <p class="lead">The definition pack has become a responsive Rails application, public ingestion API, browser tracker, background-job runtime, admin setup surface, repeatable demo environment, and deployment blueprint.</p>
           <div class="grid four metric-grid">
-            <div class="card metric"><span>HTTP integration tests</span><strong>9</strong><span>77 assertions</span></div>
+            <div class="card metric"><span>Behavioral tests</span><strong>18</strong><span>134 assertions</span></div>
             <div class="card metric"><span>Security scan</span><strong>0</strong><span>Brakeman warnings</span></div>
             <div class="card metric"><span>Private roles</span><strong>4</strong><span>Tenant + location scope</span></div>
             <div class="card metric"><span>Stateful services</span><strong>1</strong><span>PostgreSQL only</span></div>
@@ -84,6 +84,7 @@
             <li>Managers can filter, assign, follow up, value, note, close, and explicitly reopen leads while every change remains attributable.</li>
             <li>Overview, locations, acquisition insights, and monthly reports reconcile to the same accepted event and lead records.</li>
             <li>The demo works on desktop and mobile and includes realistic thirty-day data for three locations.</li>
+            <li>Agency operators can activate recruiting per client; authorized hiring teams receive structured applications in a separate, audited workflow.</li>
           </ul>
         </section>
 
@@ -91,8 +92,8 @@
           <p class="eyebrow">02 · Architecture</p><h2>A deliberately boring modular monolith</h2>
           <p class="lead">Rails owns transactions and presentation; explicit ingestion, workflow, and reporting modules preserve seams for later extraction. PostgreSQL owns durable state, jobs, cache, raw events, and audit records.</p>
           <div class="architecture">
-            <div class="node"><h3>Client websites</h3><p>Cookie-free tracker plus server-side form integration. Public tracking keys map to one active website.</p></div><div class="arrow">→</div>
-            <div class="node core"><h3>Rails 8.1 application</h3><p>Public APIs · sessions and policy scope · lead workflow · metric queries · Hotwire UI · Active Job</p></div><div class="arrow">→</div>
+            <div class="node"><h3>Client websites</h3><p>Cookie-free tracker plus server-side lead and job-application forms. Public tracking keys map to one active website.</p></div><div class="arrow">→</div>
+            <div class="node core"><h3>Rails 8.1 application</h3><p>Public APIs · sessions and policy scope · sales and hiring workflows · metric queries · Hotwire UI · Active Job</p></div><div class="arrow">→</div>
             <div class="node"><h3>PostgreSQL 18</h3><p>Tenant records · immutable events · append-only history · notifications · reports · Solid Queue/cache</p></div>
           </div>
           <div class="grid two" style="margin-top:16px">
@@ -115,6 +116,7 @@
               <tr><td>F9–F10</td><td>Overview + inbox</td><td>Date/location metrics, trends, sources, pages, locations, operational filters, responsive detail workflow.</td><td><span class="pill">Built</span></td></tr>
               <tr><td>F11</td><td>Monthly summary</td><td>Versioned in-app reports, on-demand regeneration, scheduled account and location generation.</td><td><span class="pill">Built</span></td></tr>
               <tr><td>F12</td><td>Auditability</td><td>Raw events, source fields, request IDs, append-only history, notification attempts, report snapshots.</td><td><span class="pill">Built</span></td></tr>
+              <tr><td>Extension</td><td>Optional recruiting</td><td>Per-tenant activation, positions, structured intake, applicant privacy scope, stage history, and position closure.</td><td><span class="pill">Built</span></td></tr>
             </tbody>
           </table>
           <div class="callout"><strong>Implementation is not the pilot SLA.</strong><p>The software paths exist and reconcile in controlled tests. The 95%/99% reliability and response-time targets still require real pilot telemetry over the stated review windows.</p></div>
@@ -123,9 +125,9 @@
         <section id="quality">
           <p class="eyebrow">04 · Verification</p><h2>Evidence collected before handoff</h2>
           <div class="grid two" style="margin-top:25px">
-            <div class="card"><h3>Behavioral tests</h3><p>Tenant isolation, event retries, lead/contact/alert deduplication, audited workflow, lost/reopen rules, report reconciliation, scheduled reports, public validation, and full HTML page rendering.</p></div>
-            <div class="card"><h3>Static and security checks</h3><p>78 Ruby files with zero RuboCop offenses; Zeitwerk eager-load clean; Brakeman zero warnings; Ruby advisory DB and importmap audits report no vulnerable packages.</p></div>
-            <div class="card"><h3>Live browser QA</h3><p>Authenticated seeded dashboard rendered at 1440×1050 and 390×844. Navigation, charts, metric cards, location summary, and lead list remained usable at both sizes.</p></div>
+            <div class="card"><h3>Behavioral tests</h3><p>Tenant isolation, event retries, lead/contact/alert deduplication, audited sales and hiring workflows, recruitment activation, applicant location scope, report reconciliation, scheduled reports, and full HTML rendering.</p></div>
+            <div class="card"><h3>Static and security checks</h3><p>98 Ruby files with zero RuboCop offenses; Zeitwerk eager-load clean; Brakeman zero warnings; Ruby advisory DB and importmap audits report no vulnerable packages.</p></div>
+            <div class="card"><h3>Live browser QA</h3><p>The authenticated Curry Pizza Company recruiting inbox rendered at 1440×1050 and 390×844 with no horizontal overflow. Positions, applicants, activation-aware navigation, and controls remained usable.</p></div>
             <div class="card"><h3>Data contracts</h3><p>Database foreign keys, tenant-leading indexes, partial identity uniqueness, idempotency constraints, immutable event policy, and report version uniqueness enforce key invariants below controllers.</p></div>
           </div>
         </section>
@@ -138,17 +140,17 @@
             <div class="card decision"><span class="number">03</span><div><h3>Application-scoped tenancy</h3><p>Membership-derived queries plus constraints and request tests are explicit today; row-level security remains a documented later hardening option.</p></div></div>
             <div class="card decision"><span class="number">04</span><div><h3>Raw facts, derived proof</h3><p>Reports snapshot the same metric engine as the dashboard. Clicks remain intent; only won actual values count as attributed revenue.</p></div></div>
           </div>
-          <p class="lead" style="margin-top:20px">Durable records: <a href="adr/0001-modular-rails-monolith.md">ADR-0001</a> through <a href="adr/0005-runtime-and-deployment.md">ADR-0005</a>. Chronology: <a href="decision-log.md">decision log</a>.</p>
+          <p class="lead" style="margin-top:20px">Durable records: <a href="adr/0001-modular-rails-monolith.md">ADR-0001</a> through <a href="adr/0006-tenant-activated-recruiting.md">ADR-0006</a>. Chronology: <a href="decision-log.md">decision log</a>.</p>
         </section>
 
         <section id="run">
           <p class="eyebrow">06 · Local use</p><h2>From clone to dashboard</h2>
           <pre><code>bin/setup --skip-server
-bin/dev
+PORT=3001 bin/dev
 
-# open http://localhost:3000
+# open http://localhost:3001
 # agency@pippallabs.test / pippal-demo-2026</code></pre>
-          <p class="lead">Docker Compose starts PostgreSQL on port 5433. Setup migrates and idempotently seeds the Northstar Pizza demo. Development emails are written to <code>tmp/mails</code>.</p>
+          <p class="lead">Docker Compose starts PostgreSQL on port 5433. Setup migrates and idempotently seeds Curry Pizza Company with sales data, two openings, and two applications. Development emails are written to <code>tmp/mails</code>.</p>
           <p class="lead">Client integration examples are in <a href="integration-guide.md">the integration guide</a>; runnable commands and all demo roles are in <a href="../README.md">README.md</a>.</p>
         </section>
 
@@ -169,6 +171,7 @@ bin/dev
             <thead><tr><th>Gate</th><th>Needed from</th><th>Why</th></tr></thead>
             <tbody>
               <tr><td>Privacy jurisdiction and retention/deletion period</td><td>Legal + product</td><td>Controls notices, consent behavior, deletion ownership, and cache/source-record lifetime.</td></tr>
+              <tr><td>Applicant retention and résumé policy</td><td>Legal + client</td><td>Required before automated deletion or private résumé uploads are enabled.</td></tr>
               <tr><td>Pilot domains, locations, recipients, and CTA selectors</td><td>Product + client</td><td>Turns the generic validated contracts into one truthful client configuration.</td></tr>
               <tr><td>SMTP provider and sender authentication</td><td>Engineering</td><td>Required to prove delivery latency and provider-outage behavior outside local file delivery.</td></tr>
               <tr><td>Backups, alerting, and support ownership</td><td>Engineering + operations</td><td>Required for the two-week hardening gate and incident recovery.</td></tr>
@@ -177,7 +180,7 @@ bin/dev
           </table>
         </section>
 
-        <footer class="footer">Pippal Labs Light CRM · Local implementation completed 10 August 2026 · Generated as a standalone HTML handoff artifact.</footer>
+        <footer class="footer">Pippal Labs Light CRM · Local implementation updated 11 August 2026 · Standalone HTML handoff artifact.</footer>
       </div>
     </main>
   </div>

@@ -45,3 +45,32 @@ curl https://crm.example.com/v1/leads \
 
 A retry returns the original lead with `duplicate: true`; it does not create another contact, lead, history entry, or alert.
 
+## Job application capture
+
+Recruiting is available to every client workspace but its API accepts submissions only after an agency administrator activates the feature and a hiring manager publishes an open position. Submit applications from the client's form backend:
+
+```sh
+curl https://crm.example.com/v1/job_applications \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "tracking_key": "pk_replace_me",
+    "idempotency_key": "job-form-record-7832",
+    "position_key": "kitchen-team-member",
+    "occurred_at": "2026-08-11T19:00:00Z",
+    "name": "Sam Lee",
+    "email": "sam@example.com",
+    "phone": "+16045550142",
+    "availability": "Evenings and weekends",
+    "experience": "Two years in a busy restaurant kitchen.",
+    "motivation": "I enjoy serving the local community.",
+    "location_key": "downtown",
+    "source": "careers_form",
+    "page_url": "https://example.com/careers",
+    "privacy_notice_version": "2026-08",
+    "future_opportunities_consent": false
+  }'
+```
+
+The application is stored separately from CRM contacts and leads. The privacy-notice version is required, future-opportunity consent is explicit, and retries with the same idempotency key return the original application. Closing the position immediately stops further intake for its key.
+
+Résumé uploads are intentionally not accepted. Before adding attachments, configure private object storage, file allowlists and size limits, malware scanning, signed downloads, and an approved retention/deletion policy.

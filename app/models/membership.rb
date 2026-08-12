@@ -23,6 +23,14 @@ class Membership < ApplicationRecord
     agency_admin? || client_owner? || location_manager?
   end
 
+  def can_access_recruiting?
+    !viewer?
+  end
+
+  def can_manage_recruiting?
+    agency_admin? || client_owner?
+  end
+
   private
 
   def location_belongs_to_tenant

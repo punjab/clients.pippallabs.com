@@ -3,6 +3,7 @@ class Website < ApplicationRecord
   belongs_to :fallback_location, class_name: "Location", optional: true
   has_many :events, dependent: :restrict_with_exception
   has_many :leads, dependent: :restrict_with_exception
+  has_many :job_applications, dependent: :restrict_with_exception
 
   attr_reader :tracking_key
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_154000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_10_162000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,6 +65,78 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_154000) do
     t.index ["tenant_id", "session_id", "occurred_at"], name: "index_events_on_tenant_id_and_session_id_and_occurred_at"
     t.index ["tenant_id"], name: "index_events_on_tenant_id"
     t.index ["website_id"], name: "index_events_on_website_id"
+  end
+
+  create_table "job_applicants", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "name", null: false
+    t.string "phone"
+    t.bigint "tenant_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tenant_id", "email"], name: "index_job_applicants_on_tenant_id_and_email", unique: true
+    t.index ["tenant_id"], name: "index_job_applicants_on_tenant_id"
+  end
+
+  create_table "job_application_histories", force: :cascade do |t|
+    t.bigint "actor_id"
+    t.string "change_type", null: false
+    t.datetime "created_at", null: false
+    t.string "from_status"
+    t.bigint "job_application_id", null: false
+    t.text "note"
+    t.datetime "occurred_at", null: false
+    t.bigint "tenant_id", null: false
+    t.string "to_status"
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_job_application_histories_on_actor_id"
+    t.index ["job_application_id"], name: "index_job_application_histories_on_job_application_id"
+    t.index ["tenant_id", "job_application_id", "occurred_at"], name: "index_job_application_histories_on_tenant_application_time"
+    t.index ["tenant_id"], name: "index_job_application_histories_on_tenant_id"
+  end
+
+  create_table "job_applications", force: :cascade do |t|
+    t.text "availability"
+    t.datetime "created_at", null: false
+    t.text "experience"
+    t.boolean "future_opportunities_consent", default: false, null: false
+    t.string "idempotency_key", null: false
+    t.bigint "job_applicant_id", null: false
+    t.bigint "job_posting_id", null: false
+    t.bigint "location_id"
+    t.text "motivation"
+    t.datetime "occurred_at", null: false
+    t.text "page_url", default: "unknown", null: false
+    t.string "privacy_notice_version", null: false
+    t.string "request_id", null: false
+    t.string "source", default: "unknown", null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "tenant_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "website_id", null: false
+    t.index ["job_applicant_id"], name: "index_job_applications_on_job_applicant_id"
+    t.index ["job_posting_id"], name: "index_job_applications_on_job_posting_id"
+    t.index ["location_id"], name: "index_job_applications_on_location_id"
+    t.index ["tenant_id", "idempotency_key"], name: "index_job_applications_on_tenant_id_and_idempotency_key", unique: true
+    t.index ["tenant_id", "location_id", "created_at"], name: "idx_on_tenant_id_location_id_created_at_837ca80b47"
+    t.index ["tenant_id", "status", "created_at"], name: "index_job_applications_on_tenant_id_and_status_and_created_at"
+    t.index ["tenant_id"], name: "index_job_applications_on_tenant_id"
+    t.index ["website_id"], name: "index_job_applications_on_website_id"
+  end
+
+  create_table "job_postings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "key", null: false
+    t.bigint "location_id"
+    t.integer "status", default: 0, null: false
+    t.bigint "tenant_id", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_job_postings_on_location_id"
+    t.index ["tenant_id", "key"], name: "index_job_postings_on_tenant_id_and_key", unique: true
+    t.index ["tenant_id", "status", "created_at"], name: "index_job_postings_on_tenant_id_and_status_and_created_at"
+    t.index ["tenant_id"], name: "index_job_postings_on_tenant_id"
   end
 
   create_table "lead_histories", force: :cascade do |t|
@@ -362,10 +434,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_154000) do
     t.index ["tracking_key_digest"], name: "index_websites_on_tracking_key_digest", unique: true
   end
 
+  create_table "workspace_features", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: false, null: false
+    t.string "key", null: false
+    t.bigint "tenant_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tenant_id", "key"], name: "index_workspace_features_on_tenant_id_and_key", unique: true
+    t.index ["tenant_id"], name: "index_workspace_features_on_tenant_id"
+  end
+
   add_foreign_key "contacts", "tenants"
   add_foreign_key "events", "locations"
   add_foreign_key "events", "tenants"
   add_foreign_key "events", "websites"
+  add_foreign_key "job_applicants", "tenants"
+  add_foreign_key "job_application_histories", "job_applications"
+  add_foreign_key "job_application_histories", "tenants"
+  add_foreign_key "job_application_histories", "users", column: "actor_id"
+  add_foreign_key "job_applications", "job_applicants"
+  add_foreign_key "job_applications", "job_postings"
+  add_foreign_key "job_applications", "locations"
+  add_foreign_key "job_applications", "tenants"
+  add_foreign_key "job_applications", "websites"
+  add_foreign_key "job_postings", "locations"
+  add_foreign_key "job_postings", "tenants"
   add_foreign_key "lead_histories", "leads"
   add_foreign_key "lead_histories", "tenants"
   add_foreign_key "lead_histories", "users", column: "actor_id"
@@ -393,4 +486,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_154000) do
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "websites", "locations", column: "fallback_location_id"
   add_foreign_key "websites", "tenants"
+  add_foreign_key "workspace_features", "tenants"
 end

@@ -18,7 +18,7 @@ bin/setup --skip-server
 bin/dev
 ```
 
-Open <http://localhost:3000> and sign in with:
+Open <http://localhost:3000> and sign in with. If port 3000 is already occupied, run `PORT=3001 bin/dev` and open <http://localhost:3001> instead.
 
 ```text
 agency@pippallabs.test
@@ -27,9 +27,9 @@ pippal-demo-2026
 
 Other demo roles use the same password:
 
-- `owner@northstar.test` — client owner
-- `manager@northstar.test` — Downtown-only location manager
-- `viewer@northstar.test` — read-only viewer
+- `owner@currypizzacompany.test` — client owner
+- `manager@currypizzacompany.test` — Downtown-only location manager
+- `viewer@currypizzacompany.test` — read-only viewer
 
 The local PostgreSQL container listens on port `5433`. Stop it with `docker compose stop`; data remains in the named Docker volume.
 
@@ -37,32 +37,33 @@ The local PostgreSQL container listens on port `5433`. Stop it with `docker comp
 
 - Agency-managed tenants, locations, websites, tracking-key rotation, users, roles, workspace switching, and location scope.
 - Signed server sessions with tenant-scoped private queries and cross-tenant integration tests.
-- Idempotent `POST /v1/events` and `POST /v1/leads` ingestion with validation, payload/rate limits, safe metadata, key hashing, and retry semantics.
+- Idempotent `POST /v1/events`, `POST /v1/leads`, and `POST /v1/job_applications` ingestion with validation, payload/rate limits, safe metadata, key hashing, and retry semantics.
 - Contact resolution by normalized email/phone while preserving separate lead opportunities.
 - Lead assignment, status state machine, follow-up, value, notes, explicit reopen, and append-only actor history.
 - Durable notification intent plus asynchronous email delivery attempts and visible failures.
 - Reconciled overview, location, page/source, and versioned monthly report views.
 - Cookie-free browser tracker with session-scoped retry queue at [`public/tracker.js`](public/tracker.js).
+- Tenant-activated recruiting with positions, a privacy-separated applicant inbox, location scope, audited hiring stages, and public structured application intake.
 - Single-PostgreSQL Solid Queue and Solid Cache runtime, Docker image, and Render blueprint.
 
 ## Public API examples
 
-Use the demo key `pk_demo_northstar_local` only for local development.
+Use the demo key `pk_demo_curry_local` only for local development.
 
 ```sh
 curl http://localhost:3000/v1/events \
   -H 'Content-Type: application/json' \
   -d '{
-    "tracking_key":"pk_demo_northstar_local",
+    "tracking_key":"pk_demo_curry_local",
     "event_id":"evt-local-1",
     "event_type":"page_view",
     "occurred_at":"2026-08-10T19:00:00Z",
     "session_id":"visit-local-1",
-    "page_url":"https://northstar-pizza.test/menu"
+    "page_url":"https://currypizzacompany.test/menu"
   }'
 ```
 
-See [`docs/integration-guide.md`](docs/integration-guide.md) for tracker markup and server-side lead capture.
+See [`docs/integration-guide.md`](docs/integration-guide.md) for tracker markup, server-side lead capture, and structured job-application intake.
 
 ## Verification
 
@@ -75,7 +76,7 @@ bundle exec bundler-audit check --update
 bin/rails zeitwerk:check
 ```
 
-The implementation suite covers tenant/location isolation, public idempotency, contact and alert deduplication, audited workflow transitions, report reconciliation, UI rendering, security validation, and scheduled report generation.
+The implementation suite covers tenant/location isolation, public idempotency, contact and alert deduplication, audited sales and hiring workflows, recruitment activation/privacy boundaries, report reconciliation, UI rendering, security validation, and scheduled report generation.
 
 ## Deployment recommendation
 
@@ -95,4 +96,5 @@ No cloud resources have been created. Before pilot deployment, approve the priva
 - [`docs/decision-log.md`](docs/decision-log.md) — chronological decisions
 - [`docs/adr/`](docs/adr/) — durable architecture decisions
 - [`docs/integration-guide.md`](docs/integration-guide.md) — website and form integration
+- [`docs/recruiting-spec.md`](docs/recruiting-spec.md) — optional recruitment behavior, access, workflow, and privacy boundary
 - [`00-read-me.md`](00-read-me.md) through [`05-delivery-and-decisions.md`](05-delivery-and-decisions.md) — product definition pack

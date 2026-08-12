@@ -18,6 +18,11 @@ Rails.application.routes.draw do
       post :rotate, on: :member
     end
     resources :memberships, only: :create, module: :workspace
+    resources :features, only: :update, module: :workspace
+  end
+  resource :recruiting, only: :show, controller: :recruiting do
+    resources :positions, only: %i[create update], controller: "recruiting/job_postings"
+    resources :applications, only: %i[show update], controller: "recruiting/job_applications"
   end
   namespace :agency do
     resources :tenants, only: %i[index create]
@@ -32,6 +37,7 @@ Rails.application.routes.draw do
         post :reopen
       end
     end
+    resources :job_applications, only: :create
     resources :locations, only: :index
     resources :reports, only: %i[index show]
   end

@@ -54,10 +54,12 @@ module Authentication
       ip_address: request.remote_ip
     ).tap do |created_session|
       Current.session = created_session
-      cookies.signed.permanent[:session_id] = {
+      cookies.signed[:session_id] = {
         value: created_session.id,
         httponly: true,
-        same_site: :lax
+        same_site: :lax,
+        secure: Rails.env.production?,
+        expires: 14.days.from_now
       }
     end
   end

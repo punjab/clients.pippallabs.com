@@ -3,6 +3,8 @@ class Location < ApplicationRecord
   has_many :memberships, dependent: :nullify
   has_many :events, dependent: :nullify
   has_many :leads, dependent: :nullify
+  has_many :job_postings, dependent: :nullify
+  has_many :job_applications, dependent: :nullify
   has_many :notifications, dependent: :nullify
   has_many :reports, dependent: :destroy
 
