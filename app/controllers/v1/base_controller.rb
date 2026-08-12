@@ -5,7 +5,7 @@ module V1
     private
 
     def require_lead_manager!
-      return if current_membership&.can_manage_leads?
+      return if can_manage_leads?
 
       render json: { error: "forbidden" }, status: :forbidden
     end

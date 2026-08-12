@@ -11,9 +11,20 @@ class Membership < ApplicationRecord
     viewer: 3
   }
 
+  ROLE_LABELS = {
+    "agency_admin" => "Agency admin",
+    "client_owner" => "Owner",
+    "location_manager" => "Manager",
+    "viewer" => "Viewer"
+  }.freeze
+
   validates :user_id, uniqueness: { scope: :tenant_id }
   validate :location_belongs_to_tenant
   validate :location_manager_has_location
+
+  def role_label
+    ROLE_LABELS.fetch(role)
+  end
 
   def accessible_locations
     location_manager? ? tenant.locations.where(id: location_id) : tenant.locations.all

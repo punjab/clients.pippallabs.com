@@ -3,10 +3,10 @@ module V1
     def summary
       from, to = date_range
       render json: Metrics::Summary.call(
-        tenant: current_membership.tenant,
+        tenant: current_tenant,
         from:,
         to:,
-        location_ids: current_membership.location_manager? ? current_membership.location_id : permitted_location_ids
+        location_ids: location_scoped? ? current_membership.location_id : permitted_location_ids
       )
     rescue ArgumentError
       render json: { error: "invalid_date_range" }, status: :unprocessable_entity
@@ -25,7 +25,7 @@ module V1
     def permitted_location_ids
       return if params[:location_id].blank?
 
-      current_membership.accessible_locations.where(id: params[:location_id]).pluck(:id)
+      accessible_locations.where(id: params[:location_id]).pluck(:id)
     end
   end
 end

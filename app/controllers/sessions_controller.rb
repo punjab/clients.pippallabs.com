@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
   def create
     user = User.authenticate_by(params.permit(:email_address, :password))
 
-    if user && user.memberships.exists?
+    if user && (user.super_admin? || user.memberships.exists?)
       start_new_session_for(user)
       redirect_to session.delete(:return_to_after_authenticating) || root_path
     else
@@ -22,8 +22,13 @@ class SessionsController < ApplicationController
   end
 
   def switch
-    membership = current_user.memberships.find(params[:membership_id])
-    Current.session.update!(membership:)
-    redirect_to root_path, notice: "Switched to #{membership.tenant.name}."
+    if current_user.super_admin? && params[:tenant_id].present?
+      tenant = Tenant.find(params[:tenant_id])
+      Current.session.update!(tenant:, membership: current_user.memberships.find_by(tenant:))
+    else
+      membership = current_user.memberships.find(params[:membership_id])
+      Current.session.update!(membership:, tenant: membership.tenant)
+    end
+    redirect_to root_path, notice: "Switched to #{Current.session.tenant.name}."
   end
 end

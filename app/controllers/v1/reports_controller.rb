@@ -14,8 +14,8 @@ module V1
     private
 
     def scoped_reports
-      scope = current_membership.tenant.reports
-      current_membership.location_manager? ? scope.where(location_id: current_membership.location_id) : scope
+      scope = current_tenant.reports
+      location_scoped? ? scope.where(location_id: current_membership.location_id) : scope
     end
 
     def set_report

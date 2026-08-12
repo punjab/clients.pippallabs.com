@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_162000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_11_230100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -259,10 +259,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_162000) do
     t.datetime "created_at", null: false
     t.string "ip_address"
     t.bigint "membership_id"
+    t.bigint "tenant_id"
     t.datetime "updated_at", null: false
     t.string "user_agent"
     t.bigint "user_id", null: false
     t.index ["membership_id"], name: "index_sessions_on_membership_id"
+    t.index ["tenant_id"], name: "index_sessions_on_tenant_id"
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -414,6 +416,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_162000) do
     t.string "email_address", null: false
     t.string "name", null: false
     t.string "password_digest", null: false
+    t.boolean "super_admin", default: false, null: false
     t.datetime "updated_at", null: false
     t.index "lower((email_address)::text)", name: "index_users_on_lower_email", unique: true
   end
@@ -477,6 +480,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_162000) do
   add_foreign_key "reports", "locations"
   add_foreign_key "reports", "tenants"
   add_foreign_key "sessions", "memberships"
+  add_foreign_key "sessions", "tenants"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

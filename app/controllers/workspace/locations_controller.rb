@@ -14,9 +14,5 @@ module Workspace
     def location_params
       params.require(:location).permit(:name, :key, :alert_email)
     end
-
-    def require_agency_admin!
-      redirect_to root_path, alert: "Agency admin access is required." unless current_membership.agency_admin?
-    end
   end
 end

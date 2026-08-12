@@ -30,9 +30,5 @@ module Workspace
 
       raise ActionController::BadRequest, "Unknown membership role"
     end
-
-    def require_agency_admin!
-      redirect_to root_path, alert: "Agency admin access is required." unless current_membership.agency_admin?
-    end
   end
 end

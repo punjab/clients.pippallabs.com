@@ -9,11 +9,5 @@ module Workspace
     rescue ActiveRecord::RecordInvalid => error
       redirect_to workspace_path, alert: error.record.errors.full_messages.to_sentence
     end
-
-    private
-
-    def require_agency_admin!
-      redirect_to root_path, alert: "Agency admin access is required." unless current_membership.agency_admin?
-    end
   end
 end

@@ -3,4 +3,5 @@ class Current < ActiveSupport::CurrentAttributes
 
   delegate :user, to: :session, allow_nil: true
   delegate :membership, to: :session, allow_nil: true
+  delegate :tenant, to: :session, allow_nil: true
 end

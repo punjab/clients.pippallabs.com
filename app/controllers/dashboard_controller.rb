@@ -6,7 +6,7 @@ class DashboardController < ApplicationController
     return unless @range
 
     @summary = Metrics::Summary.call(tenant: current_tenant, from: @range.begin, to: @range.end, location_ids: selected_location_ids)
-    @locations = current_membership.accessible_locations.active.order(:name)
+    @locations = accessible_locations.active.order(:name)
     @recent_leads = scoped_leads.non_spam.includes(:contact, :location, :owner).order(created_at: :desc).limit(5)
   end
 
@@ -14,6 +14,6 @@ class DashboardController < ApplicationController
 
   def scoped_leads
     scope = current_tenant.leads
-    current_membership.location_manager? ? scope.where(location_id: current_membership.location_id) : scope
+    location_scoped? ? scope.where(location_id: current_membership.location_id) : scope
   end
 end

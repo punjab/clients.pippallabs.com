@@ -72,8 +72,10 @@ class LeadWorkflow
   end
 
   def authorize!
+    return if actor&.super_admin?
+
     allowed = membership&.can_manage_leads? && membership.tenant_id == lead.tenant_id
-    allowed &&= membership.accessible_locations.where(id: lead.location_id).exists? if membership.location_manager?
+    allowed &&= membership.accessible_locations.where(id: lead.location_id).exists? if membership&.location_manager?
     raise Forbidden, "lead is outside the current membership scope" unless allowed
   end
 
@@ -91,14 +93,14 @@ class LeadWorkflow
   end
 
   def change_owner(attributes)
-    owner = attributes[:owner_id].present? ? membership.tenant.users.find(attributes[:owner_id]) : nil
+    owner = attributes[:owner_id].present? ? lead.tenant.users.find(attributes[:owner_id]) : nil
     before = lead.owner_id
     lead.owner = owner
     history("assigned", changeset: { from_owner_id: before, to_owner_id: owner&.id })
   end
 
   def change_location(attributes)
-    location = attributes[:location_id].present? ? membership.accessible_locations.find(attributes[:location_id]) : nil
+    location = attributes[:location_id].present? ? assignable_locations.find(attributes[:location_id]) : nil
     before = lead.location_id
     lead.location = location
     history("assigned", changeset: { from_location_id: before, to_location_id: location&.id })
@@ -121,6 +123,10 @@ class LeadWorkflow
     estimated = attributes.key?(:estimated_value) && parse_money(attributes[:estimated_value]) != lead.estimated_value
     actual = attributes.key?(:actual_value) && parse_money(attributes[:actual_value]) != lead.actual_value
     estimated || actual
+  end
+
+  def assignable_locations
+    actor&.super_admin? || membership.nil? ? lead.tenant.locations : membership.accessible_locations
   end
 
   def history(change_type, from_status: nil, to_status: nil, changeset: {})
