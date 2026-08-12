@@ -42,5 +42,11 @@ class DashboardUiTest < ActionDispatch::IntegrationTest
     get workspace_path
     assert_response :success
     assert_select "h1", text: /Configure Northstar Pizza/
+    assert_select "button", text: "Add location"
+    assert_select "button", text: "Add website"
+    assert_select "button", text: "Add member"
+    assert_select "dialog form[action=?]", workspace_locations_path
+    assert_select "dialog form[action=?]", workspace_websites_path
+    assert_select "dialog form[action=?]", workspace_memberships_path
   end
 end
