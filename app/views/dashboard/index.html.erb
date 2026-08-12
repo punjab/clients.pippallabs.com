@@ -8,7 +8,7 @@
   <%= render "shared/metric_card", label: "Visits", value: number_with_delimiter(@summary[:totals][:visits]), caption: "Distinct accepted website sessions", tone: "bg-blue-50 text-blue-700", icon_name: :insights %>
   <%= render "shared/metric_card", label: "Order intent", value: number_with_delimiter(@summary[:totals][:order_intent]), caption: "Order clicks, reported as intent", tone: "bg-amber-50 text-amber-700", icon_name: :arrow %>
   <%= render "shared/metric_card", label: "Leads", value: number_with_delimiter(@summary[:totals][:leads]), caption: "#{@summary[:totals][:lead_conversion_rate]}% of visits converted", tone: "bg-violet-50 text-violet-700", icon_name: :leads %>
-  <%= render "shared/metric_card", label: "Attributed value", value: money(@summary[:totals][:attributed_value]), caption: "Actual value from won leads only", tone: "bg-emerald-50 text-emerald-700", icon_name: :reports %>
+  <%= render "shared/metric_card", label: "Won value", value: money(@summary[:totals][:attributed_value]), caption: "Actual value from won leads only", tone: "bg-emerald-50 text-emerald-700", icon_name: :reports %>
 </section>
 
 <section class="mt-5 grid gap-5 xl:grid-cols-[1.55fr_1fr]">

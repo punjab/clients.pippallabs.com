@@ -32,10 +32,19 @@ module Authentication
 
   def resume_session
     Current.session ||= find_session_by_cookie
+
+    # A session whose membership was revoked has no tenant left to act in;
+    # treat it as signed out rather than serving whatever tenant it last saw.
+    if Current.session && Current.session.tenant.nil? && !Current.session.user.super_admin?
+      terminate_session
+      Current.session = nil
+    end
+
+    Current.session
   end
 
   def find_session_by_cookie
-    Session.includes(:user, membership: :tenant).find_by(id: cookies.signed[:session_id])
+    Session.includes(:user, :tenant, membership: :tenant).find_by(id: cookies.signed[:session_id])
   end
 
   def request_authentication
@@ -48,8 +57,10 @@ module Authentication
   end
 
   def start_new_session_for(user, membership: user.memberships.first)
+    tenant = membership&.tenant || (Tenant.order(:name).first if user.super_admin?)
     user.sessions.create!(
       membership: membership,
+      tenant: tenant,
       user_agent: request.user_agent,
       ip_address: request.remote_ip
     ).tap do |created_session|

@@ -25,7 +25,7 @@ module Recruiting
     end
 
     def require_recruiting_manager!
-      return if current_tenant.feature_enabled?(:recruiting) && current_membership.can_manage_recruiting?
+      return if current_tenant.feature_enabled?(:recruiting) && can_manage_recruiting?
 
       redirect_to root_path, alert: "Recruiting manager access is required."
     end

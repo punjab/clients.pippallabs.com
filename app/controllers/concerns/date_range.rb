@@ -15,9 +15,9 @@ module DateRange
   end
 
   def selected_location_ids
-    return current_membership.location_id if current_membership.location_manager?
+    return current_membership.location_id if location_scoped?
     return if params[:location_id].blank?
 
-    current_membership.accessible_locations.where(id: params[:location_id]).pluck(:id)
+    accessible_locations.where(id: params[:location_id]).pluck(:id)
   end
 end

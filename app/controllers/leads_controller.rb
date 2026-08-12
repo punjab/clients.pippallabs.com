@@ -3,7 +3,7 @@ class LeadsController < ApplicationController
   before_action :require_manager!, only: %i[update note reopen]
 
   def index
-    @locations = current_membership.accessible_locations.active.order(:name)
+    @locations = accessible_locations.active.order(:name)
     @members = current_tenant.memberships.includes(:user).where(role: %i[agency_admin client_owner location_manager])
     @leads = filtered_leads.includes(:contact, :location, :owner).order(created_at: :desc).limit(100)
     @counts = scoped_leads.group(:status).count.transform_keys { |key| Lead.statuses.key(key) }
@@ -11,7 +11,7 @@ class LeadsController < ApplicationController
 
   def show
     @members = current_tenant.memberships.includes(:user).where(role: %i[agency_admin client_owner location_manager])
-    @locations = current_membership.accessible_locations.active.order(:name)
+    @locations = accessible_locations.active.order(:name)
     @history = @lead.histories.includes(:actor).order(occurred_at: :desc)
   end
 
@@ -40,7 +40,7 @@ class LeadsController < ApplicationController
 
   def scoped_leads
     scope = current_tenant.leads
-    current_membership.location_manager? ? scope.where(location_id: current_membership.location_id) : scope
+    location_scoped? ? scope.where(location_id: current_membership.location_id) : scope
   end
 
   def filtered_leads
@@ -63,7 +63,7 @@ class LeadsController < ApplicationController
   end
 
   def require_manager!
-    redirect_to lead_path(@lead), alert: "You have view-only access." unless current_membership.can_manage_leads?
+    redirect_to lead_path(@lead), alert: "You have view-only access." unless can_manage_leads?
   end
 
   def lead_params

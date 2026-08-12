@@ -48,6 +48,8 @@ class JobApplicationWorkflow
   attr_reader :application, :actor, :membership
 
   def authorize!
+    return if actor&.super_admin?
+
     allowed = membership&.can_access_recruiting? && membership.tenant_id == application.tenant_id
     allowed &&= membership.location_id == application.location_id if membership&.location_manager?
     raise Forbidden, "application is outside the current membership scope" unless allowed

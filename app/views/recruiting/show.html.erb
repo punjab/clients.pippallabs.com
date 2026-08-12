@@ -1,6 +1,6 @@
 <% content_for :title, "Recruiting · Pippal CRM" %>
 <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-  <div><p class="eyebrow">Private hiring workspace</p><h1 class="mt-2 text-3xl font-extrabold tracking-tight">Recruiting</h1><p class="mt-2 max-w-2xl text-sm text-slate-500">Review applicants separately from customer contacts and sales leads.</p></div>
+  <div><p class="eyebrow">Private hiring workspace</p><h1 class="mt-2 text-3xl font-extrabold tracking-tight">Recruiting</h1><p class="mt-2 max-w-2xl text-sm text-slate-500">Review Applicants or Post new jobs</p></div>
 </div>
 
 <div class="mt-7 grid gap-5 xl:grid-cols-[1fr_380px]">
@@ -19,7 +19,7 @@
     <div class="divide-y divide-slate-100">
       <% @job_postings.each do |position| %>
         <div class="flex items-start justify-between gap-4 px-6 py-5">
-          <div><h2 class="text-base font-bold"><%= position.title %></h2><p class="mt-1 text-xs text-slate-400"><%= position.key %> · <%= position.location&.name || "All locations" %></p><p class="mt-2 text-sm leading-6 text-slate-500"><%= position.description %></p><% if current_membership.can_manage_recruiting? %><%= button_to position.status_open? ? "Close applications" : "Reopen applications", recruiting_position_path(position), method: :patch, params: { status: position.status_open? ? "closed" : "open" }, class: "mt-3 text-xs font-bold text-slate-500 hover:text-slate-900" %><% end %></div>
+          <div><h2 class="text-base font-bold"><%= position.title %></h2><p class="mt-1 text-xs text-slate-400"><%= position.key %> · <%= position.location&.name || "All locations" %></p><p class="mt-2 text-sm leading-6 text-slate-500"><%= position.description %></p><% if can_manage_recruiting? %><%= button_to position.status_open? ? "Close applications" : "Reopen applications", recruiting_position_path(position), method: :patch, params: { status: position.status_open? ? "closed" : "open" }, class: "mt-3 text-xs font-bold text-slate-500 hover:text-slate-900" %><% end %></div>
           <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider <%= position.status_open? ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' %>"><%= position.status %></span>
         </div>
       <% end %>
@@ -27,7 +27,7 @@
     </div>
   </section></div>
 
-  <% if current_membership.can_manage_recruiting? %>
+  <% if can_manage_recruiting? %>
     <section class="panel h-fit p-6"><p class="eyebrow">New opening</p><h2 class="mt-2 text-xl font-bold">Publish a position</h2><%= form_with model: JobPosting.new, url: recruiting_positions_path, class: "mt-5 space-y-3" do |form| %><%= form.text_field :title, required: true, placeholder: "Position title", class: "field" %><%= form.text_field :key, required: true, placeholder: "position-key", class: "field" %><%= form.collection_select :location_id, @locations, :id, :name, { include_blank: "All locations" }, class: "field" %><%= form.text_area :description, rows: 4, placeholder: "Short public description", class: "field" %><%= form.submit "Publish position", class: "button-primary w-full" %><% end %></section>
   <% end %>
 </div>

@@ -23,7 +23,7 @@ module Recruiting
 
     def scoped_applications
       scope = current_tenant.job_applications
-      current_membership.location_manager? ? scope.where(location_id: current_membership.location_id) : scope
+      location_scoped? ? scope.where(location_id: current_membership.location_id) : scope
     end
 
     def set_application
@@ -31,7 +31,7 @@ module Recruiting
     end
 
     def require_recruiting_access!
-      return if current_tenant.feature_enabled?(:recruiting) && current_membership.can_access_recruiting?
+      return if current_tenant.feature_enabled?(:recruiting) && can_access_recruiting?
 
       redirect_to root_path, alert: "Recruiting access is not available."
     end

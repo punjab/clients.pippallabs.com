@@ -18,16 +18,20 @@ website.assign_attributes(name: "Curry Pizza Company main site", allowed_domain:
 website.save!
 
 people = [
-  [ "Asha Kapoor", "agency@pippallabs.test", :agency_admin, nil ],
+  [ "Asha Kapoor", "agency@pippallabs.test", :super_admin, nil ],
   [ "Priya Shah", "owner@currypizzacompany.test", :client_owner, nil ],
   [ "Maya Chen", "manager@currypizzacompany.test", :location_manager, locations.first ],
   [ "Noah Williams", "viewer@currypizzacompany.test", :viewer, nil ]
 ].map do |name, email, role, location|
   legacy_email = email.sub("@currypizzacompany.test", "@northstar.test")
   user = User.find_by(email_address: email) || User.find_by(email_address: legacy_email) || User.new
-  user.assign_attributes(name:, email_address: email, password: demo_password)
+  user.assign_attributes(name:, email_address: email, password: demo_password, super_admin: role == :super_admin)
   user.save!
-  tenant.memberships.find_or_initialize_by(user:).tap { |membership| membership.update!(role:, location:) }
+  if role == :super_admin
+    user.memberships.destroy_all
+  else
+    tenant.memberships.find_or_initialize_by(user:).tap { |membership| membership.update!(role:, location:) }
+  end
   [ role, user ]
 end.to_h
 

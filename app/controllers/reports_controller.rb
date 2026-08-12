@@ -10,8 +10,8 @@ class ReportsController < ApplicationController
 
   def create
     month = params[:month].present? ? Date.strptime(params[:month], "%Y-%m") : Date.current.beginning_of_month
-    location = params[:location_id].present? ? current_membership.accessible_locations.find(params[:location_id]) : nil
-    location ||= current_membership.location if current_membership.location_manager?
+    location = params[:location_id].present? ? accessible_locations.find(params[:location_id]) : nil
+    location ||= current_membership.location if location_scoped?
     report = ReportGenerator.call(tenant: current_tenant, period_start: month.beginning_of_month, period_end: month.end_of_month, location:)
     redirect_to report_path(report), notice: "Monthly summary generated from current source records."
   rescue Date::Error, ActiveRecord::RecordNotFound
@@ -22,7 +22,7 @@ class ReportsController < ApplicationController
 
   def scoped_reports
     scope = current_tenant.reports.status_ready
-    current_membership.location_manager? ? scope.where(location_id: current_membership.location_id) : scope
+    location_scoped? ? scope.where(location_id: current_membership.location_id) : scope
   end
 
   def set_report

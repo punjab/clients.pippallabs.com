@@ -59,8 +59,8 @@ module V1
     private
 
     def scoped_leads
-      scope = current_membership.tenant.leads
-      current_membership.location_manager? ? scope.where(location_id: current_membership.location_id) : scope
+      scope = current_tenant.leads
+      location_scoped? ? scope.where(location_id: current_membership.location_id) : scope
     end
 
     def set_lead
