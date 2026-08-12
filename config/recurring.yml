@@ -15,4 +15,4 @@ production:
     schedule: every hour at minute 12
   generate_monthly_reports:
     class: GenerateMonthlyReportsJob
-    schedule: at 6am on the 1st day of every month
+    schedule: "0 6 1 * *"
