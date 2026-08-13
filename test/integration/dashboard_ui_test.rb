@@ -49,4 +49,15 @@ class DashboardUiTest < ActionDispatch::IntegrationTest
     assert_select "dialog form[action=?]", workspace_websites_path
     assert_select "dialog form[action=?]", workspace_memberships_path
   end
+
+  test "trend chart bars stay within bounds when leads outnumber visits" do
+    @tenant.leads.create!(website: @website, contact: @contact, location: @location, idempotency_key: "lead-101", lead_type: "catering", occurred_at: Time.current, message: "Dinner for 20", request_id: "req-101")
+
+    get root_path
+    assert_response :success
+
+    heights = response.body.scan(/height:([\d.]+)%/).flatten.map(&:to_f)
+    assert heights.any?, "expected trend chart bars to render"
+    assert heights.all? { |height| height <= 100 }, "chart bar exceeds chart bounds: #{heights.max}%"
+  end
 end
