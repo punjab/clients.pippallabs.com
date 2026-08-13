@@ -14,7 +14,7 @@
 <section class="mt-5 grid gap-5 xl:grid-cols-[1.55fr_1fr]">
   <article class="panel p-5 lg:p-6">
     <div class="flex items-center justify-between"><div><p class="eyebrow">Activity trend</p><h2 class="mt-1 text-lg font-bold">Visits and leads</h2></div><div class="flex gap-4 text-xs font-semibold text-slate-400"><span><i class="mr-1 inline-block h-2 w-2 rounded-full bg-slate-900"></i>Visits</span><span><i class="mr-1 inline-block h-2 w-2 rounded-full bg-amber-300"></i>Leads</span></div></div>
-    <% max_value = [@summary[:trend].map { |point| point[:visits] }.max.to_i, 1].max %>
+    <% max_value = [@summary[:trend].flat_map { |point| [point[:visits].to_i, point[:leads].to_i] }.max.to_i, 1].max %>
     <div class="mt-8 flex h-44 items-end gap-1.5 border-b border-slate-100">
       <% @summary[:trend].each do |point| %>
         <div class="group relative flex h-full min-w-0 flex-1 items-end gap-px" title="<%= point[:date] %>: <%= point[:visits] %> visits, <%= point[:leads] %> leads">
