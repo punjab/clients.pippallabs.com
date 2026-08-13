@@ -1,5 +1,5 @@
 class Lead < ApplicationRecord
-  TYPES = %w[catering general franchise event other].freeze
+  TYPES = %w[catering general franchise event newsletter other].freeze
   ACTIVE_STATUSES = %w[new contacted quoted].freeze
   TERMINAL_STATUSES = %w[won lost spam].freeze
 
