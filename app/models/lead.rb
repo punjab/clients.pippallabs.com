@@ -21,6 +21,8 @@ class Lead < ApplicationRecord
   validate :tenant_boundaries_match
 
   scope :non_spam, -> { where.not(status: statuses[:spam]) }
+  scope :newsletter, -> { where(lead_type: "newsletter") }
+  scope :non_newsletter, -> { where.not(lead_type: "newsletter") }
   scope :active, -> { where(status: ACTIVE_STATUSES.map { |name| statuses.fetch(name) }) }
   scope :overdue, -> { active.where(follow_up_at: ...Time.current) }
 

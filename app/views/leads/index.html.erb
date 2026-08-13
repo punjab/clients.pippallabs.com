@@ -8,7 +8,7 @@
 
 <%= form_with url: leads_path, method: :get, class: "panel mt-4 grid gap-3 p-4 md:grid-cols-6" do |form| %>
   <%= form.search_field :q, value: params[:q], placeholder: "Search name or email", class: "field !mt-0 md:col-span-2" %>
-  <%= form.select :type, Lead::TYPES.map { |type| [type.humanize, type] }, { include_blank: "All lead types", selected: params[:type] }, class: "field !mt-0" %>
+  <%= form.select :type, (Lead::TYPES - %w[newsletter]).map { |type| [type.humanize, type] }, { include_blank: "All lead types", selected: params[:type] }, class: "field !mt-0" %>
   <%= form.select :location_id, @locations.map { |location| [location.name, location.id] }, { include_blank: "All locations", selected: params[:location_id] }, class: "field !mt-0" %>
   <%= form.select :follow_up, [["Overdue", "overdue"], ["Upcoming", "upcoming"], ["Not scheduled", "unset"]], { include_blank: "Any follow-up", selected: params[:follow_up] }, class: "field !mt-0" %>
   <%= form.submit "Filter", class: "button-primary" %>

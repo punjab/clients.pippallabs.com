@@ -39,7 +39,7 @@ class LeadsController < ApplicationController
   private
 
   def scoped_leads
-    scope = current_tenant.leads
+    scope = current_tenant.leads.non_newsletter
     location_scoped? ? scope.where(location_id: current_membership.location_id) : scope
   end
 

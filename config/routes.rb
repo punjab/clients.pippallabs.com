@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     end
   end
   resources :locations, only: :index
+  resource :newsletter, only: :show, controller: :newsletter
   resource :insights, only: :show, controller: :insights
   resources :reports, only: %i[index show create]
   resource :workspace, only: :show, controller: :workspace do
