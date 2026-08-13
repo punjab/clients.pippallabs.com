@@ -19,9 +19,9 @@ class NewsletterController < ApplicationController
 
   def signups_csv(signups)
     rows = signups.map do |signup|
-      [signup.contact.email, signup.contact.email_consent, signup.contact.email_consent_at&.iso8601, signup.occurred_at.iso8601]
+      [ signup.contact.email, signup.contact.email_consent, signup.contact.email_consent_at&.iso8601, signup.occurred_at.iso8601 ]
     end
-    ([%w[email consent consent_at signed_up_at]] + rows).map { |row| row.map { |field| csv_field(field) }.join(",") }.join("\n") + "\n"
+    ([ %w[email consent consent_at signed_up_at] ] + rows).map { |row| row.map { |field| csv_field(field) }.join(",") }.join("\n") + "\n"
   end
 
   def csv_field(value)
