@@ -42,7 +42,7 @@ now = Time.current
 30.times do |day|
   (3 + day % 5).times do |visit_number|
     session_id = "demo-#{day}-#{visit_number}"
-    occurred_at = (now - day.days).change(hour: 11 + visit_number % 6, min: visit_number * 7)
+    occurred_at = [ (now - day.days).change(hour: 11 + visit_number % 6, min: visit_number * 7), now ].min
     location = locations[(day + visit_number) % locations.length]
     source = sources[(day * 2 + visit_number) % sources.length]
     page = pages[(day + visit_number) % pages.length]
