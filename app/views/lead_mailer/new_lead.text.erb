@@ -1,8 +1,20 @@
+PIPPAL CRM - LEAD ALERT
+
 New <%= @lead.lead_type.humanize.downcase %> lead
-
-<%= @contact.name.presence || "Website visitor" %> submitted a new request.
+<%= @contact.name.presence || "A website visitor" %> just submitted a request.
+<% if @lead.message.present? %>
 <%= @lead.message %>
-
+<% end %>
 Location: <%= @lead.location&.name || "Unknown" %>
-Open Pippal CRM to assign and follow up with this lead.
+<% if @contact.email.present? -%>
+Email: <%= @contact.email %>
+<% end -%>
+<% if @contact.phone.present? -%>
+Phone: <%= @contact.phone %>
+<% end -%>
+Received: <%= l(@lead.occurred_at.in_time_zone(@lead.tenant.time_zone), format: :short) %>
 
+Open the lead in Pippal CRM:
+<%= lead_url(@lead) %>
+
+You're receiving this because lead alerts are enabled for <%= @lead.location&.name || "your workspace" %>.
