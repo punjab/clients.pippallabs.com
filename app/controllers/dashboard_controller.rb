@@ -7,7 +7,7 @@ class DashboardController < ApplicationController
 
     @summary = Metrics::Summary.call(tenant: current_tenant, from: @range.begin, to: @range.end, location_ids: selected_location_ids)
     @locations = accessible_locations.active.order(:name)
-    @recent_leads = scoped_leads.non_spam.includes(:contact, :location, :owner).order(created_at: :desc).limit(5)
+    @recent_leads = scoped_leads.non_spam.non_newsletter.includes(:contact, :location, :owner).order(created_at: :desc).limit(5)
   end
 
   private

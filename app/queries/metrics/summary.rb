@@ -39,7 +39,7 @@ module Metrics
 
     def leads
       @leads ||= begin
-        scope = tenant.leads.non_spam.where(occurred_at: range)
+        scope = tenant.leads.non_spam.non_newsletter.where(occurred_at: range)
         location_ids ? scope.where(location_id: location_ids) : scope
       end
     end
