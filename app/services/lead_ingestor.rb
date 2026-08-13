@@ -20,11 +20,13 @@ class LeadIngestor
       contact = ContactResolver.call(tenant:, attributes:)
       created_lead = tenant.leads.create!(lead_attributes.merge(website:, contact:, location: resolve_location))
       created_lead.histories.create!(tenant:, change_type: "created", to_status: created_lead.status, occurred_at: Time.current)
-      notification = build_notification(created_lead)
-      notification.save!
+      if alertable?(created_lead)
+        notification = build_notification(created_lead)
+        notification.save!
+      end
       created_lead
     end
-    LeadAlertJob.perform_later(notification) if notification.status_pending?
+    LeadAlertJob.perform_later(notification) if notification&.status_pending?
     Result.new(lead:, duplicate: false)
   rescue ActiveRecord::RecordNotUnique
     Result.new(lead: tenant.leads.find_by!(idempotency_key: attributes[:idempotency_key]), duplicate: true)
@@ -55,6 +57,10 @@ class LeadIngestor
     return tenant.locations.active.find_by(key:) if key
 
     website.fallback_location || tenant.locations.active.find_by(key: tenant.default_location_key)
+  end
+
+  def alertable?(lead)
+    lead.lead_type != "newsletter"
   end
 
   def build_notification(lead)
